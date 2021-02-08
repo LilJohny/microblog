@@ -2,12 +2,12 @@ from flask import render_template, redirect, url_for, flash, request
 from werkzeug.urls import url_parse
 from flask_login import login_user, logout_user, current_user
 from flask_babel import _
-from app import db
-from app.auth import bp
-from app.auth.forms import LoginForm, RegistrationForm, \
+from microblog import db
+from microblog.auth import bp
+from microblog.auth.forms import LoginForm, RegistrationForm, \
     ResetPasswordRequestForm, ResetPasswordForm
-from app.models import User
-from app.auth.email import send_password_reset_email
+from microblog.models import User
+from microblog.auth.email import send_password_reset_email
 
 
 @bp.route('/login', methods=['GET', 'POST'])

@@ -3,9 +3,9 @@ import sys
 import time
 from flask import render_template
 from rq import get_current_job
-from app import create_app, db
-from app.models import User, Post, Task
-from app.email import send_email
+from microblog import create_app, db
+from microblog.models import User, Post, Task
+from microblog.email import send_email
 
 app = create_app()
 app.app_context().push()

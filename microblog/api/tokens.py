@@ -1,7 +1,7 @@
 from flask import jsonify
-from app import db
-from app.api import bp
-from app.api.auth import basic_auth, token_auth
+from microblog import db
+from microblog.api import bp
+from microblog.api.auth import basic_auth, token_auth
 
 
 @bp.route('/tokens', methods=['POST'])
