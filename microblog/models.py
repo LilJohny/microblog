@@ -83,8 +83,8 @@ class PaginatedAPIMixin(object):
 
 followers = db.Table(
     'followers',
-    db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
-    db.Column('followed_id', db.Integer, db.ForeignKey('user.id'))
+    db.Column('follower_id', db.Integer, db.ForeignKey('user.id_')),
+    db.Column('followed_id', db.Integer, db.ForeignKey('user.id_'))
 )
 
 
@@ -143,7 +143,7 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
     def followed_posts(self):
         followed = Post.query.join(
             followers, (followers.c.followed_id == Post.user_id)).filter(
-                followers.c.follower_id == self.id)
+            followers.c.follower_id == self.id)
         own = Post.query.filter_by(user_id=self.id)
         return followed.union(own).order_by(Post.timestamp.desc())
 
@@ -156,11 +156,11 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
     @staticmethod
     def verify_reset_password_token(token):
         try:
-            id = jwt.decode(token, current_app.config['SECRET_KEY'],
-                            algorithms=['HS256'])['reset_password']
-        except:
+            id_ = jwt.decode(token, current_app.config['SECRET_KEY'],
+                             algorithms=['HS256'])['reset_password']
+        except Exception:
             return
-        return User.query.get(id)
+        return User.query.get(id_)
 
     def new_messages(self):
         last_read_time = self.last_message_read_time or datetime(1900, 1, 1)
@@ -190,7 +190,7 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
 
     def to_dict(self, include_email=False):
         data = {
-            'id': self.id,
+            'id_': self.id,
             'username': self.username,
             'last_seen': self.last_seen.isoformat() + 'Z',
             'about_me': self.about_me,
@@ -236,8 +236,8 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
 
 
 @login.user_loader
-def load_user(id):
-    return User.query.get(int(id))
+def load_user(id_):
+    return User.query.get(int(id_))
 
 
 class Post(SearchableMixin, db.Model):
@@ -245,7 +245,7 @@ class Post(SearchableMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     body = db.Column(db.String(140))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id_'))
     language = db.Column(db.String(5))
 
     def __repr__(self):
@@ -254,8 +254,8 @@ class Post(SearchableMixin, db.Model):
 
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id_'))
+    recipient_id = db.Column(db.Integer, db.ForeignKey('user.id_'))
     body = db.Column(db.String(140))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
@@ -266,7 +266,7 @@ class Message(db.Model):
 class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), index=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id_'))
     timestamp = db.Column(db.Float, index=True, default=time)
     payload_json = db.Column(db.Text)
 
@@ -278,7 +278,7 @@ class Task(db.Model):
     id = db.Column(db.String(36), primary_key=True)
     name = db.Column(db.String(128), index=True)
     description = db.Column(db.String(128))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id_'))
     complete = db.Column(db.Boolean, default=False)
 
     def get_rq_job(self):
